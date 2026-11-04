@@ -42,8 +42,7 @@ public class UI {
         SmartDashboard.putNumber("Aim Error", Robot.limelight.getXOffset());
 
         // Shooter
-        SmartDashboard.putNumber("M1 RPM", Robot.shooter.getRPMOne());
-        SmartDashboard.putNumber("M2 RPM", Robot.shooter.getRPMTwo());
+        SmartDashboard.putNumber("Shooter RPM", Robot.shooter.getRPM());
         SmartDashboard.putBoolean("Shooter Ready", Robot.shooter.isReady());
 
         // Drivetrain
