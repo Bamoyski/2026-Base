@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team.gif.robot.commands.Collect;
 import team.gif.robot.commands.Shoot;
-import team.gif.robot.commands.StopEverything;
 
 /**
  * Operator interface: one Xbox controller does everything.
@@ -14,9 +13,8 @@ import team.gif.robot.commands.StopEverything;
  * <pre>
  *   Left stick Y    forward / back
  *   Right stick X   turn
- *   Left bumper     collect (collector + indexer)
+ *   Left bumper     collect (collector only)
  *   Right bumper    shoot (shooter + indexer, spindexer after a 1 s delay)
- *   X (hold)        panic stop everything
  * </pre>
  *
  * <p>Turret aiming is automatic and has no button. Collector pivot and reverse
@@ -30,20 +28,17 @@ public class OI {
 
     public final Trigger dLBump = driver.leftBumper();
     public final Trigger dRBump = driver.rightBumper();
-    public final Trigger dX = driver.x();
 
     public OI() {
         // No need to flood the console when the single controller is unplugged.
         DriverStation.silenceJoystickConnectionWarning(true);
 
         // Collect is the left bumper, matching how the robot has always been driven.
+        // It runs the collector by itself; the indexer belongs to the shoot sequence.
         dLBump.and(DriverStation::isEnabled).whileTrue(new Collect());
 
         // Shoot is the right bumper: shooter + indexer start together, then the
         // spindexer joins in after the spin-up delay (see Shoot).
         dRBump.and(DriverStation::isEnabled).whileTrue(new Shoot());
-
-        // Panic stop stays available at all times, including while disabled.
-        dX.whileTrue(new StopEverything());
     }
 }

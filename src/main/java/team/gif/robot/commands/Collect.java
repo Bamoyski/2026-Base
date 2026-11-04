@@ -5,23 +5,24 @@ import team.gif.robot.Constants;
 import team.gif.robot.Robot;
 
 /**
- * Forward-only collect command.
+ * Forward-only collect command, bound to the left bumper.
  *
- * <p>Runs the collector and the indexer wheels together so a single button pulls
- * fuel in and stages it. There is deliberately no reverse: young drivers should not
- * be able to launch fuel back out of the robot.
+ * <p>Runs the collector only. The indexer is a separate mechanism and is driven
+ * by {@link Shoot}, not by collecting.
+ *
+ * <p>There is deliberately no reverse: young drivers should not be able to launch
+ * fuel back out of the robot.
  */
 public class Collect extends Command {
 
     public Collect() {
         super();
-        addRequirements(Robot.collector, Robot.indexerWheels);
+        addRequirements(Robot.collector);
     }
 
     @Override
     public void execute() {
         Robot.collector.turn(Constants.COLLECTOR_IN_PERCENT);
-        Robot.indexerWheels.turn(Constants.INDEX_WHEELS_SPEED_PER);
     }
 
     @Override
@@ -32,6 +33,5 @@ public class Collect extends Command {
     @Override
     public void end(boolean interrupted) {
         Robot.collector.turn(0);
-        Robot.indexerWheels.turn(0);
     }
 }
