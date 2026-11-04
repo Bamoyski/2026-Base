@@ -9,8 +9,8 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import team.gif.robot.Constants;
 import team.gif.robot.RobotMap;
 
 public class Shooter extends SubsystemBase {
@@ -24,11 +24,6 @@ public class Shooter extends SubsystemBase {
     public TalonFXConfiguration configurationOne;
     public TalonFXConfiguration configurationTwo;
     public VelocityVoltage velocityVoltage;
-    public double Kp = 0;
-        //0.00025;
-    double Ki = 0;
-    double Kd = 0;
-    public double speed = 0;
 
     public Shooter() {
         shooterMotorOne = new TalonFX(RobotMap.SHOOT_MOTOR_ID_ONE);
@@ -69,25 +64,6 @@ public class Shooter extends SubsystemBase {
     }
 
 
-    public void periodic() {
-        double newP = SmartDashboard.getNumber("P", 0);
-        double newSpeed = SmartDashboard.getNumber("speed", 0);
-        double oldP = configurationOne.Slot0.kP;
-
-        if(newSpeed != speed){
-            speed = newSpeed;
-        }
-
-        if (newP!=oldP) {
-            configurationOne.Slot0.kP = newP;
-            configurationTwo.Slot0.kP = newP;
-
-            setConfig(configurationOne, configurationTwo);
-
-        }
-
-    }
-
     public void turn(double voltage) {
         shooterMotorOne.setVoltage(voltage);
         shooterMotorTwo.setVoltage(voltage);
@@ -101,6 +77,15 @@ public class Shooter extends SubsystemBase {
     public void stopMotors() {
         shooterMotorOne.stopMotor();
         shooterMotorTwo.stopMotor();
+    }
+
+    /**
+     * True when the flywheel is close enough to the fixed outreach speed to feed.
+     *
+     * <p>Uses the absolute value because the motors spin in opposite directions.
+     */
+    public boolean isReady() {
+        return Math.abs(getRPMOne()) >= Constants.SHOOTER_RPM - Constants.SHOOTER_RPM_TOLERANCE;
     }
 
     public double getRPMOne(){
