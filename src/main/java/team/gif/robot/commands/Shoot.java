@@ -1,22 +1,28 @@
 package team.gif.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import team.gif.robot.Constants;
 import team.gif.robot.Robot;
 
 /**
- * Shoot command: spin the flywheel to a fixed RPM, then feed once it is up to speed.
+ * Shoot command, bound to the right bumper.
  *
- * <p>Outreach robots shoot from roughly 2-3 meters, so the speed is fixed rather
- * than calculated from camera distance. That keeps the behavior the same no matter
- * where the driver is standing.
+ * <p>Timing is fixed and simple:
+ * <ol>
+ *   <li>Shooter and indexer start immediately.</li>
+ *   <li>After {@link Constants#SHOOT_FEED_DELAY_SECONDS}, the spindexer starts
+ *       feeding fuel into the shooter.</li>
+ *   <li>Releasing the button stops everything.</li>
+ * </ol>
  *
- * <p>The feed is latched: once the shooter reaches the target it keeps feeding
- * until the button is released, so a small RPM dip does not make the note stutter.
+ * <p>The delay is intentional rather than RPM-based: it gives the flywheel a
+ * consistent head start, and it behaves the same every time for demos.
  */
 public class Shoot extends Command {
 
-    private boolean feeding;
+    /** Counts time since the right bumper was pressed. */
+    private final Timer spinUpTimer = new Timer();
 
     public Shoot() {
         super();
@@ -26,24 +32,20 @@ public class Shoot extends Command {
 
     @Override
     public void initialize() {
-        feeding = false;
+        spinUpTimer.reset();
+        spinUpTimer.start();
     }
 
     @Override
     public void execute() {
+        // Shooter and indexer run for the whole press.
         Robot.shooter.setRPM(Constants.SHOOTER_RPM);
+        Robot.indexerWheels.turn(Constants.INDEX_WHEELS_SPEED_PER);
 
-        // Latch as soon as the flywheel is close enough to the target speed.
-        if (!feeding && Robot.shooter.isReady()) {
-            feeding = true;
-        }
-
-        if (feeding) {
-            Robot.indexerWheels.turn(Constants.INDEX_WHEELS_SPEED_PER);
+        // Spindexer only joins in after the fixed head-start delay.
+        if (spinUpTimer.hasElapsed(Constants.SHOOT_FEED_DELAY_SECONDS)) {
             Robot.neoSpinDexer.setRPM(Constants.SPINDEXER_RPM);
         } else {
-            // Still spinning up: keep the fuel path still so nothing jams.
-            Robot.indexerWheels.turn(0);
             Robot.neoSpinDexer.turn(0);
         }
     }
@@ -55,9 +57,9 @@ public class Shoot extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        spinUpTimer.stop();
         Robot.shooter.stopMotors();
         Robot.indexerWheels.turn(0);
         Robot.neoSpinDexer.turn(0);
-        feeding = false;
     }
 }

@@ -47,6 +47,13 @@ public final class Constants {
     /** Indexer wheel output while collecting or feeding. */
     public static final double INDEX_WHEELS_SPEED_PER = 0.5;
 
+    /**
+     * Seconds the shooter and indexer run before the spindexer starts feeding.
+     *
+     * <p>Gives the flywheel a consistent head start before fuel is pushed in.
+     */
+    public static final double SHOOT_FEED_DELAY_SECONDS = 1.0;
+
     // ---------------------------------------------------------------------
     // Drivetrain
     // ---------------------------------------------------------------------

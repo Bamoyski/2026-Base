@@ -12,11 +12,11 @@ import team.gif.robot.commands.StopEverything;
  *
  * <p>Binding table for the outreach robot:
  * <pre>
- *   Left stick Y   forward / back
- *   Right stick X  turn
- *   A (hold)       collect
- *   B (hold)       shoot (spins up, then feeds automatically)
- *   X (hold)       panic stop everything
+ *   Left stick Y    forward / back
+ *   Right stick X   turn
+ *   Left bumper     collect (collector + indexer)
+ *   Right bumper    shoot (shooter + indexer, spindexer after a 1 s delay)
+ *   X (hold)        panic stop everything
  * </pre>
  *
  * <p>Turret aiming is automatic and has no button. Collector pivot and reverse
@@ -28,16 +28,22 @@ public class OI {
     public final CommandXboxController driver =
             new CommandXboxController(RobotMap.DRIVER_CONTROLLER_ID);
 
-    public final Trigger dA = driver.a();
-    public final Trigger dB = driver.b();
+    public final Trigger dLBump = driver.leftBumper();
+    public final Trigger dRBump = driver.rightBumper();
     public final Trigger dX = driver.x();
 
     public OI() {
         // No need to flood the console when the single controller is unplugged.
         DriverStation.silenceJoystickConnectionWarning(true);
 
-        dA.and(DriverStation::isEnabled).whileTrue(new Collect());   // hold A: forward collect + index
-        dB.and(DriverStation::isEnabled).whileTrue(new Shoot());     // hold B: spin up, then auto-feed
-        dX.whileTrue(new StopEverything());                         // hold X: stop every mechanism
+        // Collect is the left bumper, matching how the robot has always been driven.
+        dLBump.and(DriverStation::isEnabled).whileTrue(new Collect());
+
+        // Shoot is the right bumper: shooter + indexer start together, then the
+        // spindexer joins in after the spin-up delay (see Shoot).
+        dRBump.and(DriverStation::isEnabled).whileTrue(new Shoot());
+
+        // Panic stop stays available at all times, including while disabled.
+        dX.whileTrue(new StopEverything());
     }
 }
