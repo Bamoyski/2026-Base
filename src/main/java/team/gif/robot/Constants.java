@@ -38,14 +38,22 @@ public final class Constants {
      *
      * <p>Negative matches the old {@code SpinerSpin} direction, which is the direction
      * that actually moves note/fuel into the shooter.
+     *
+     * <p>Reduced from -2000 to cut battery draw during long demos. Raise it back up
+     * if fuel starts jamming on the way into the shooter.
      */
-    public static final double SPINDEXER_RPM = -2000.0;
+    public static final double SPINDEXER_RPM = -1200.0;
 
     /** Collector motor output while collecting. Negative is "pull in" on this robot. */
-    public static final double COLLECTOR_IN_PERCENT = -0.75;
+    public static final double COLLECTOR_IN_PERCENT = -0.5;
 
-    /** Indexer wheel output while collecting or feeding. */
-    public static final double INDEX_WHEELS_SPEED_PER = 0.5;
+    /**
+     * Indexer wheel output while feeding.
+     *
+     * <p>Collecting does not use this; the collector is a separate mechanism.
+     * Reduced from 0.5 to cut battery draw.
+     */
+    public static final double INDEX_WHEELS_SPEED_PER = 0.3;
 
     /**
      * Seconds the shooter and indexer run before the spindexer starts feeding.
